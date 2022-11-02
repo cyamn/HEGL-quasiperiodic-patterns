@@ -27,7 +27,7 @@ function setup() {
   verticalHeight = thickness * sqrt(gradient ** 2 + 1);
   regionWidth = 5;
 
-  createCanvas(windowWidth - 20, windowHeight - 20);
+  createCanvas(800, 800);
 
   zMax = ceil(maxAccepted(regionWidth));
   zMin = floor(minAccepted(0));
@@ -36,13 +36,6 @@ function setup() {
   y_accepted = [];
   z_accepted = [];
 
-  drawOnce();
-}
-
-function drawOnce() {
-  background(255);
-  translate(140, 140);
-  fill(0);
   for (x = 0; x <= regionWidth; x++) {
     for (y = 0; y <= regionWidth; y++) {
       for (z = zMin; z <= zMax; z++) {
@@ -54,6 +47,15 @@ function drawOnce() {
       }
     }
   }
+
+  drawOnce();
+}
+
+function drawOnce() {
+  background(255);
+  translate(140, 140);
+  fill(0);
+
   for (i = 0; i < x_accepted.length; i++) {
     for (j = 0; j < y_accepted.length; j++) {
       let x_final =

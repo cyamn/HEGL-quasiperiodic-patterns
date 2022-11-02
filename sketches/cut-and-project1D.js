@@ -23,19 +23,22 @@ function setup() {
   verticalHeight = thickness * sqrt(gradient ** 2 + 1);
   regionWidth = 5;
 
-  createCanvas(windowWidth - 20, windowHeight - 20);
+  createCanvas(800, 200);
 
   yMax = ceil(maxAccepted(regionWidth));
   yMin = floor(minAccepted(0));
 
   x_accepted = [];
   y_accepted = [];
+
+  drawOnce();
 }
 
-function draw() {
-  background(255);
+function drawOnce() {
   translate(140, height / 2);
+  background(255);
   fill(0);
+
   for (x = 0; x <= regionWidth; x++) {
     for (y = yMin; y <= yMax; y++) {
       if (isWithinRegion(x, y)) {
