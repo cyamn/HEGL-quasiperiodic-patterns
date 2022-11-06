@@ -12,6 +12,7 @@
       async
       src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
     ></script>
+    <link rel="icon" type="image/x-icon" href="/screenshots/favicon.ico" />
     <title>Introduction</title>
     <script>
       let sides = 3;
@@ -57,7 +58,7 @@
 
       function sketch_tilings(p) {
         p.setup = function () {
-          p.createCanvas(550, 400);
+          p.createCanvas(1850, 400);
         };
 
         let oldSides = -1;
@@ -72,14 +73,14 @@
           if (correctTilings.includes(sides)) {
             epsilon = 35;
           } else {
-            epsilon = 35 * 1.8;
+            epsilon = 36 * 1.8;
             console.log(sides + " is not in " + correctTilings);
           }
           p.clear();
           p.fill(255);
-          p.stroke(0);
+          p.stroke(255);
           p.translate(200, 200);
-          let polygonSize = 40;
+          let polygonSize = 41;
           p.polygon(0, 0, polygonSize, sides);
         };
 
@@ -145,7 +146,7 @@
     class="bg-gradient-to-r from-pink-500 to-yellow-500 text-white m-4 sm:m-8 md:m-16"
   >
     <!-- <a href="../index.html"> Home </a> -->
-    <h1 class="text-2xl sm:text-3xl md:text-5xl text-center font-mono">
+    <h1 class="text-3xl sm:text-4xl md:text-5xl text-center font-mono">
       Introduction
     </h1>
     <p class="text-center text-sm">
@@ -156,25 +157,30 @@
       class="h-min basis-1/2 m-2 p-2 bg-gradient-to-br from-slate-50 to-slate-200 text-slate-900 rounded-lg font-mono tracking-tight leading-tight shadow-lg"
     >
       <h2 class="text-2xl">Tilings</h2>
-      A tiling is a set of geometric shapes, called tiles, that are arranged in
-      such a way to fill a plane without gaps or overlaps. A tiling can be
-      periodic or non- periodic. Periodic tilings are constructed with a
-      repeating pattern - the tiling has translational symmetry. The different
-      types of tiles that make up a tiling are called the prototiles of that
-      tiling. A tiling may be constructed using one or many prototiles.
+      <p class="text-justify">
+        A tiling is a set of geometric shapes, called tiles, that are arranged
+        in such a way to fill a plane without gaps or overlaps. A tiling can be
+        periodic or non- periodic. Periodic tilings are constructed with a
+        repeating pattern - the tiling has translational symmetry. The different
+        types of tiles that make up a tiling are called the prototiles of that
+        tiling. A tiling may be constructed using one or many prototiles.
+      </p>
     </div>
     <div class="flex flex-col sm:flex-col md:flex-row">
       <div
         class="h-min basis-1/2 m-2 p-2 bg-gradient-to-br from-slate-50 to-slate-200 text-slate-900 rounded-lg font-mono tracking-tight leading-tight shadow-lg"
       >
         <h2 class="text-2xl">Periodic Tilings</h2>
-        The simplest tilings are constructed using regular polygons as the
-        single prototile. There are only three possible regular polygon tilings:
-        made of equilateral triangles, squares or regular hexagons. These have
-        three–, four–, and six–fold rotational symmetry respectively. It is not
-        possible to tile a plane with pen- tagons, because the internal angle of
-        a pentagon, 108°, is not a divisor of 360°. The same restriction applies
-        to n > 6–sided polygons. <br />
+        <p class="text-justify">
+          The simplest tilings are constructed using regular polygons as the
+          single prototile. There are only three possible regular polygon
+          tilings: made of equilateral triangles, squares or regular hexagons.
+          These have three–, four–, and six–fold rotational symmetry
+          respectively. It is not possible to tile a plane with pen- tagons,
+          because the internal angle of a pentagon, 108°, is not a divisor of
+          360°. The same restriction applies to n > 6–sided polygons.
+        </p>
+        <br />
         <div
           class="h-min basis-1/2 mt-5 md:m-2 py-4 md:p-2 px-10 bg-gradient-to-br from-slate-900 to-slate-700 rounded-lg shadow-lg text-slate-100"
         >
@@ -212,33 +218,49 @@
       class="h-min basis-1/2 m-2 p-2 bg-gradient-to-br from-slate-50 to-slate-200 text-slate-900 rounded-lg font-mono tracking-tight leading-tight shadow-lg"
     >
       <h2 class="text-2xl">Quasiperiodic tilings</h2>
-      subset of non-periodic tilings are quasiperiodic tilings. Although these
-      tilings are not periodic, every finite region within the tiling reappears
-      infinitely many times. Some quasiperiodic tilings also exhibit forbidden
-      orders of rota- tional symmetry. The concept of quasiperiodic tilings have
-      been of interest to physicists as a mathematical model of quasicrystals
-      (QCs) since their discovery in 1982 by Dan Shechtman [1]. This discovery
-      was made following observations of a rapidly cooled aluminium-manganese
-      alloy through an electron microscope. QCs are structures that possess
-      long-range order, but not translational symmetry. The atomic structures of
-      QCs are associated with quasiperiodic tilings. The QC discovered by
-      Shechtman possesses fivefold symmetry, and other QCs have been found to
-      possess other forbidden symmetries. These materials are typically
-      synthesised in the laboratory. Following analysis conducted in 2009 by
-      Paul Steinhardt on a Siberian meteorite sample [2] the first natural QC,
-      icosahedrite, was found. The golden ratio, τ, is intrinsically linked to
-      many of the tilings discussed in this report. This irrational number
-      appears when the ratio of two quantities is equal to the ratio of their
-      sum and the larger value. Expressed algebraically: $$\tau =
-      \cfrac{a+b}{a}+ \cfrac{a}{b}=\cfrac{1=\sqrt(5)}{2}$$
+      <p class="text-justify">
+        subset of non-periodic tilings are quasiperiodic tilings. Although these
+        tilings are not periodic, every finite region within the tiling
+        reappears infinitely many times. Some quasiperiodic tilings also exhibit
+        forbidden orders of rota- tional symmetry. The concept of quasiperiodic
+        tilings have been of interest to physicists as a mathematical model of
+        quasicrystals (QCs) since their discovery in 1982 by Dan Shechtman [1].
+        This discovery was made following observations of a rapidly cooled
+        aluminium-manganese alloy through an electron microscope. QCs are
+        structures that possess long-range order, but not translational
+        symmetry. The atomic structures of QCs are associated with quasiperiodic
+        tilings. The QC discovered by Shechtman possesses fivefold symmetry, and
+        other QCs have been found to possess other forbidden symmetries. These
+        materials are typically synthesised in the laboratory. Following
+        analysis conducted in 2009 by Paul Steinhardt on a Siberian meteorite
+        sample [2] the first natural QC, icosahedrite, was found. The golden
+        ratio, τ, is intrinsically linked to many of the tilings discussed in
+        this report. This irrational number appears when the ratio of two
+        quantities is equal to the ratio of their sum and the larger value.
+        Expressed algebraically: $$\tau = \cfrac{a+b}{a}+
+        \cfrac{a}{b}=\cfrac{1=\sqrt(5)}{2}$$
+      </p>
     </div>
-    <div class="flex justify-center items-center">
-      <button
+
+    <div
+      id="tilings"
+      class="overflow-hidden h-min basis-1/2 m-2 p-2 bg-gradient-to-br from-slate-900 to-slate-700 rounded-lg shadow-lg"
+    >
+      <!-- <button
         onclick="start()"
         class="m-2 p-2 text-2xl button bg-gradient-to-r hover:from-slate-50 hover:to-slate-200 hover:text-slate-900 hover:outline outline-2 outline-slate-900 from-slate-700 to-slate-900 p-1 rounded-md shadow-lg"
       >
         Click here to continue
-      </button>
+      </button> -->
+      <div class="text-2xl">
+        <span class="font-bold">Coming up: </span>
+        Introduction to Fibonacci tilings by the cut and project method.
+        <a class="underline underline-offset-4" href="">Click to continue</a>
+        or
+        <a class="underline underline-offset-4" href="../gallery.html"
+          >go to the gallery</a
+        >.
+      </div>
     </div>
   </body>
 </html>

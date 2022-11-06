@@ -5,8 +5,18 @@
   top: 0;
   left: 0;
   z-index: -100;
-  animation: fadeIn 3s;
   background-color: #0f172a;
+}
+
+.fade3s {
+  animation: fadeIn 3s;
+}
+
+.fade6s {
+  animation: fadeIn 6s;
+}
+.fade9s {
+  animation: fadeIn 9s;
 }
 
 .typewriter h1 {
@@ -38,10 +48,10 @@
 
 @keyframes centerOut {
   0% {
-    transform: translate(0%, 20vh);
+    transform: translate(0%, 16vh);
   }
   55% {
-    transform: translate(0%, 20vh);
+    transform: translate(0%, 16vh);
   }
   100% {
     transform: translate(0%, 0%);
@@ -137,4 +147,14 @@
 
 body {
   transform-style: preserve-3d;
+}
+/* For Webkit-based browsers (Chrome, Safari and Opera) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* For IE, Edge and Firefox */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }

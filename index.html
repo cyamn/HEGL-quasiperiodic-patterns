@@ -7,7 +7,11 @@
     <!-- <script src="js/p5.js"></script> -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="js/particles.js"></script>
-
+    <link rel="icon" type="image/x-icon" href="/screenshots/favicon.ico" />
+    <script
+      src="https://kit.fontawesome.com/d992066cd9.js"
+      crossorigin="anonymous"
+    ></script>
     <script>
       /* particlesJS.load(@dom-id, @path-json, @callback (optional)); */
       particlesJS.load("particles-js", "assets/particles.json", function () {
@@ -15,8 +19,7 @@
       });
 
       let titles = [
-        // "HEGL Quasiperiodic Patterns",
-        "HEGL Tilings",
+        "Quasiperiodic Patterns",
         "Click start to begin",
         "Browse the gallery",
       ];
@@ -91,16 +94,36 @@
     <link rel="stylesheet" href="custom.css" />
   </head>
   <body class="bg-black text-slate-100 grid place-items-center">
-    <div class="background w-full h-full" id="particles-js"></div>
+    <div class="background fade3s w-full h-full" id="particles-js"></div>
     <div class="grid place-items-center h-screen typewriter">
       <div class=""></div>
       <div class=""></div>
       <div class="slider">
         <h1 id="banner" class="p-2 text-2xl sm:text-3xl md:text-5xl">
-          HEGL Tilings
+          Quasiperiodic Patterns
         </h1>
       </div>
-      <div id="card" class="card"></div>
+      <div class="grid grid-cols-1 sm:grid-cols-3">
+        <div
+          class="hidden sm:block sm:grid sm:place-items-center sm:text-4xl fade9s"
+          onclick="location.href='gallery.html';"
+        >
+          <i class="fa-solid fa-book px-4"></i>
+        </div>
+        <div id="card" class="card"></div>
+        <div
+          class="hidden sm:block sm:grid sm:place-items-center sm:text-4xl fade9s"
+        >
+          <i class="hidden fa-solid fa-palette"></i>
+        </div>
+      </div>
+      <div class="sm:hidden grid grid-cols-2 text-4xl fade9s text-center">
+        <i
+          class="fa-solid fa-book px-4"
+          onclick="location.href='gallery.html';"
+        ></i>
+        <i class="hidden fa-solid fa-palette px-4"></i>
+      </div>
       <button
         onclick="start()"
         class="text-2xl button bg-gradient-to-r from-green-400 to-blue-500 hover:from-pink-500 hover:to-yellow-500 p-1 rounded-md"
