@@ -12,6 +12,7 @@
       src="https://kit.fontawesome.com/d992066cd9.js"
       crossorigin="anonymous"
     ></script>
+    <script type="text/javascript" src="gallery.js"></script>
     <script>
       /* particlesJS.load(@dom-id, @path-json, @callback (optional)); */
       particlesJS.load("particles-js", "assets/particles.json", function () {
@@ -27,20 +28,6 @@
       // Will execute myCallback every 0.5 seconds
       var intervalID = window.setInterval(myCallback, 5000);
 
-      var cards = [
-        {
-          title: "fibonacci 1D",
-          src: "fibonacci-tiling1D.png",
-          desc: "The classical example to explain the cut and project method",
-          link: "cut-and-project1D.html",
-        },
-        {
-          title: "fibonacci 2D",
-          src: "fibonacci-tiling2D.png",
-          desc: "2D version of fibonacci tiling 1D",
-          link: "cut-and-project2D.html",
-        },
-      ];
       var cardIndex = 0;
 
       function myCallback() {

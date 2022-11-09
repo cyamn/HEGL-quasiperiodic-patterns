@@ -12,6 +12,8 @@
       src="https://kit.fontawesome.com/d992066cd9.js"
       crossorigin="anonymous"
     ></script>
+    <script src="js/storage.js"></script>
+    <script type="text/javascript" src="gallery.js"></script>
     <title>HEGL Quasiperiodic Patterns</title>
     <link rel="stylesheet" href="custom.css" />
   </head>
@@ -34,31 +36,11 @@
     </div>
   </body>
   <script>
+    loadStorage();
     /* particlesJS.load(@dom-id, @path-json, @callback (optional)); */
     particlesJS.load("particles-js", "assets/particles.json", function () {
       console.log("callback - particles.js config loaded");
     });
-
-    var cards = [
-      {
-        title: "filling tilings",
-        src: "filling-tilings.png",
-        desc: "Tilings and how to fill the plane with them",
-        link: "introduction.html",
-      },
-      {
-        title: "fibonacci 1D",
-        src: "fibonacci-tiling1D.png",
-        desc: "The classical example to explain the cut and project method",
-        link: "cut-and-project1D.html",
-      },
-      {
-        title: "fibonacci 2D",
-        src: "fibonacci-tiling2D.png",
-        desc: "2D version of fibonacci tiling 1D",
-        link: "cut-and-project2D.html",
-      },
-    ];
 
     function search() {
       var text = document.getElementById("searchbox").value;
@@ -74,7 +56,36 @@
       gallery.innerHTML = "";
       var found = false;
       for (var i = 0; i < cards.length; i++) {
-        if (cards[i].title.match(regex) || cards[i].desc.match(regex)) {
+        if (
+          (cards[i].title.match(regex) || cards[i].desc.match(regex)) &&
+          !storage.visited.includes(cards[i].link)
+        ) {
+          found = true;
+          gallery.innerHTML += `
+          <div id="card" class="flex flex-col break-inside-avoid">
+            <span class="font-mono ml-2 z-10 -mb-8 w-12 text-xl p-1 bg-blue-500 text-slate-100 rounded-lg">new</span>
+            <a
+              href="pages/${cards[i].link}"
+              class="block bg-gradient-to-br from-slate-100 to-slate-300 text-slate-900 p1 rounded-md w-72 grid place-items-center hover:outline outline-offset-2 outline-2 outline-slate-500 m-3"
+            >
+            <div>
+              <span>${cards[i].title}</span>
+              </div>
+              <img
+              class="object-cover"
+              src="screenshots/${cards[i].src}"
+                alt="alt"
+              />
+              <p class="m-2 text-sm leading-3">${cards[i].desc}</p>
+              </a>
+              </div>`;
+        }
+      }
+      for (var i = 0; i < cards.length; i++) {
+        if (
+          (cards[i].title.match(regex) || cards[i].desc.match(regex)) &&
+          storage.visited.includes(cards[i].link)
+        ) {
           found = true;
           gallery.innerHTML += `
           <div id="card" class="flex flex-col break-inside-avoid">
@@ -91,16 +102,6 @@
               <p class="m-2 text-sm leading-3">${cards[i].desc}</p>
               </a>
               </div>`;
-          // <a href="pages/${cards[i].link}"
-          //   class="block bg-gradient-to-br from-slate-100
-          //   to-slate-300 text-slate-900 p1 rounded-md
-          //   w-40 h-56 grid place-items-center hover:outline outline-offset-2 outline-2 outline-slate-500"
-          //   >
-          //   <img src="screenshots/${cards[i].src}" alt="" class="w-32 h-32" />
-          //   <h3 class="text-xl">${cards[i].title}</h3>
-          //   <p class="text-sm">${cards[i].desc}</p>
-          // </a>
-          // `;
         }
       }
       if (!found) {
