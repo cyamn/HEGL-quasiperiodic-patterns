@@ -17,7 +17,7 @@
     <title>Fibonacci Tilings 2D</title>
   </head>
   <body
-    class="bg-gradient-to-r from-green-500 to-blue-500 text-white m-4 sm:m-8 md:m-16"
+    class="bg-gradient-to-r from-blue-500 to-pink-500 text-white m-4 sm:m-8 md:m-16"
   >
     <!-- <a href="../index.html"> Home </a> -->
     <h1 class="text-3xl sm:text-4xl md:text-5xl text-center font-mono">
@@ -102,11 +102,7 @@
       <div class="text-2xl">
         <span class="font-bold">Coming up: </span>
         Fibonacci tilings in higher dimensions (2D).
-        <a
-          class="underline underline-offset-4"
-          href="./cut-and-projectPenrose.html"
-          >Click to continue</a
-        >
+        <a class="underline underline-offset-4" href="">Click to continue</a>
         or
         <a class="underline underline-offset-4" href="../gallery.html"
           >go to the gallery</a
@@ -175,6 +171,7 @@
 
         let oldAngle = -1;
         let oldThickness = -1;
+
         p.draw = function () {
           if (oldAngle !== angle) {
             oldAngle = angle;

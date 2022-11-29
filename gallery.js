@@ -17,4 +17,10 @@ var cards = [
     desc: "2D version of fibonacci tiling 1D",
     link: "cut-and-project2D.html",
   },
+  {
+    title: "Penrose Tiling",
+    src: "Penrose_Tiling_(Rhombi).svg",
+    desc: "The most famous quasi periodic tiling",
+    link: "cut-and-projectPenrose.html",
+  },
 ];
