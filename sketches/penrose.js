@@ -7,6 +7,13 @@ const minMesh = -maxMesh;
 function coordsToPixel([x, y]) {}
 
 let lambda, l1, l2, l3, l4, l5;
+// let oldtime = 450;
+// let oldtime = 230;
+let oldtime = 120;
+
+let etas;
+let W;
+let mesh1;
 
 function sketch_tilings(p) {
   function genMesh5D(lower, upper) {
@@ -129,12 +136,7 @@ function sketch_tilings(p) {
   }
 
   function inCutWindow([x, y, z, v, w]) {
-    const WMesh = genMesh5D(-1 / 2, 1 / 2);
-    const W = [];
-    for (let i = 0; i < WMesh.length; i++) {
-      W.push(projectOrth(WMesh[i]));
-    }
-    const etas = generateEtas();
+    // const etas = generateEtas();
     // console.log("etas: " + etas.length);
     const projected = projectOrth([x, y, z, v, w]);
     for (let j = 0; j < etas.length; j++) {
@@ -167,6 +169,13 @@ function sketch_tilings(p) {
   }
 
   p.setup = function () {
+    etas = generateEtas();
+    WMesh = genMesh5D(-1 / 2, 1 / 2);
+    W = [];
+    for (let i = 0; i < WMesh.length; i++) {
+      W.push(projectOrth(WMesh[i]));
+    }
+    mesh1 = genMesh5D(minMesh, maxMesh);
     slider = p.createSlider(0, 0.5, 0.25, 0.05);
     slider.position(10, 10);
     slider.style("width", "160px");
@@ -189,6 +198,7 @@ function sketch_tilings(p) {
 
   // Penrose tiling
   p.draw = function () {
+    let startTime = Date.now();
     const scale = 50;
     let val = slider.value();
     let val2 = slider2.value();
@@ -203,7 +213,6 @@ function sketch_tilings(p) {
 
     (l1 = val), (l2 = val2), (l3 = val3), (l4 = val4), (l5 = val5);
     lambda = [-l1, -l2, -l3, -l4, -l5];
-    const mesh1 = genMesh5D(minMesh, maxMesh);
     const mesh = [];
     for (let i = 0; i < mesh1.length; i++) {
       mesh.push(diff(mesh1[i], lambda));
@@ -235,6 +244,10 @@ function sketch_tilings(p) {
         }
       }
     }
+    let currentTime = Date.now() - startTime;
+    if (currentTime < oldtime)
+      console.log(`time: ${currentTime} ms improved from ${oldtime} ms`);
+    else console.log(`time: ${currentTime} ms worse than ${oldtime} ms`);
   };
 }
 
