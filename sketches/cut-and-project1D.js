@@ -125,6 +125,7 @@ function sketch_tilings(p) {
   let oldAngle = -1;
   let oldThickness = -1;
   p.draw = function () {
+    p.translate(30, -70);
     let val = angle;
     let val2 = thicknessIn;
     let val3 = shift;
@@ -136,7 +137,7 @@ function sketch_tilings(p) {
     p.stroke(255);
     x_accepted = [];
     y_accepted = [];
-    thickness2 = val2;
+    thickness2 = val2 / 2.0 - 0.1;
     versch = val3;
     gradient = p.tan(val);
     theta = p.atan(gradient);
@@ -187,43 +188,54 @@ function sketch_tilings(p) {
     }
     for (i = 0; i < x_accepted.length; i++) {
       p.fill(232, 121, 249);
-      p.stroke(232, 121, 249);
-      p.ellipse(
-        x_accepted[i] * scale + offs,
-        im(y_accepted[i] * scale + offs),
-        5,
-        5
+      p.stroke(255);
+      const crossLen = 5;
+      p.line(
+        x_accepted[i] * scale + offs - crossLen,
+        im(y_accepted[i] * scale + offs) - crossLen,
+        x_accepted[i] * scale + offs + crossLen,
+        im(y_accepted[i] * scale + offs) + crossLen
+      );
+      p.line(
+        x_accepted[i] * scale + offs + crossLen,
+        im(y_accepted[i] * scale + offs) - crossLen,
+        x_accepted[i] * scale + offs - crossLen,
+        im(y_accepted[i] * scale + offs) + crossLen
       );
       xprojec =
         x_accepted[i] +
         p.sin(val) * p.cos(val) * (y_accepted[i] - x_accepted[i] * gradient);
       deltax = p.sin(val) ** 2 * versch;
+      // p.linedash(
+      //   x_accepted[i] * scale + offs,
+      //   im(y_accepted[i] * scale + offs),
+      //   (xprojec + deltax) * scale + offs,
+      //   im(gradient * (xprojec + deltax - versch) * scale + offs),
+      //   2
+      // );
+      const lenProj = scale * gradient;
       p.linedash(
+        (xprojec + deltax) * scale + offs + lenProj,
+        im(gradient * (xprojec + deltax) * scale + offs) +
+          (1 / gradient) * /home/ingmar/Documents/Uni/lectures/HEGL-quasiperiodic-patterns/pages/cut-and-projectPenrose.htmllenProj,
         x_accepted[i] * scale + offs,
         im(y_accepted[i] * scale + offs),
-        (xprojec + deltax) * scale + offs,
-        im(gradient * (xprojec + deltax - versch) * scale + offs),
         2
       );
       p.ellipse(
-        (xprojec + deltax) * scale + offs,
-        im(gradient * (xprojec + deltax - versch) * scale + offs),
-        3,
-        3
+        (xprojec + deltax) * scale + offs + lenProj,
+        im(gradient * (xprojec + deltax - versch) * scale + offs) +
+          (1 / gradient) * lenProj,
+        5,
+        5
       );
     }
-    p.line(
-      xs,
-      ys + versch * gradient * scale,
-      xs + (width - 2 * offs),
-      im(gradient * (width - 2 * offs) - versch * gradient * scale) - offs
-    );
-    p.fill(255);
-    p.noStroke();
-    p.quad(0, 0, width, 0, width, offs, 0, offs);
-    p.quad(0, height - offs, width, height - offs, width, height, 0, height);
-    p.quad(0, 0, offs, 0, offs, height, 0, height);
-    p.quad(width - offs, 0, width, 0, width, height, width - offs, height);
+    // p.line(
+    //   xs,
+    //   ys + versch * gradient * scale,
+    //   xs + (width - 2 * offs),
+    //   im(gradient * (width - 2 * offs) - versch * gradient * scale) - offs
+    // );
   };
 }
 new p5(sketch_tilings, "tilings");
