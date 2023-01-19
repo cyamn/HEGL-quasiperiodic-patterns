@@ -1,12 +1,13 @@
-const width = 600;
+const width = 900;
 const height = 600;
 
-const maxMesh = 3;
+let maxMesh = 4;
 const minMesh = -maxMesh;
 
 function coordsToPixel([x, y]) {}
 
-let lambda, l1, l2, l3, l4, l5;
+let lambda = Array(5).fill(0);
+let l1, l2, l3, l4, l5;
 // let oldtime = 450;
 // let oldtime = 230;
 let oldtime = 120;
@@ -14,6 +15,27 @@ let oldtime = 120;
 let etas;
 let W;
 let mesh1;
+
+function changeLambdaX(val) {
+  l1 = parseFloat(val);
+  document.getElementById("lambdaX").innerHTML = val;
+}
+function changeLambdaY(val) {
+  l2 = parseFloat(val);
+  document.getElementById("lambdaY").innerHTML = val;
+}
+function changeLambdaZ(val) {
+  l3 = parseFloat(val);
+  document.getElementById("lambdaZ").innerHTML = val;
+}
+function changeLambdaC(val) {
+  l4 = parseFloat(val);
+  document.getElementById("lambdaC").innerHTML = val;
+}
+function changeLambdaV(val) {
+  l5 = parseFloat(val);
+  document.getElementById("lambdaV").innerHTML = val;
+}
 
 function sketch_tilings(p) {
   function genMesh5D(lower, upper) {
@@ -175,22 +197,13 @@ function sketch_tilings(p) {
     for (let i = 0; i < WMesh.length; i++) {
       W.push(projectOrth(WMesh[i]));
     }
+    lambda = Array(5).fill(0);
+    l1 = 0.25;
+    l2 = 0.25;
+    l3 = 0.25;
+    l4 = 0.25;
+    l5 = 0.25;
     mesh1 = genMesh5D(minMesh, maxMesh);
-    slider = p.createSlider(0, 0.5, 0.25, 0.05);
-    slider.position(10, 10);
-    slider.style("width", "160px");
-    slider2 = p.createSlider(0, 0.5, 0.25, 0.05);
-    slider2.position(10, 30);
-    slider2.style("width", "160px");
-    slider3 = p.createSlider(0, 0.5, 0.25, 0.05);
-    slider3.position(10, 50);
-    slider3.style("width", "160px");
-    slider4 = p.createSlider(0, 0.5, 0.25, 0.05);
-    slider4.position(10, 70);
-    slider4.style("width", "160px");
-    slider5 = p.createSlider(0, 0.5, 0.25, 0.05);
-    slider5.position(10, 90);
-    slider5.style("width", "160px");
     p.createCanvas(width, height);
     p.stroke(255);
     p.draw();
@@ -198,20 +211,28 @@ function sketch_tilings(p) {
 
   // Penrose tiling
   p.draw = function () {
+    maxMesh = 3;
+
     let startTime = Date.now();
-    const scale = 50;
-    let val = slider.value();
-    let val2 = slider2.value();
-    let val3 = slider3.value();
-    let val4 = slider4.value();
-    let val5 = slider5.value();
-    if (val === l1 && val2 === l2 && val3 === l3 && val4 === l4 && val5 == l5) {
-      return;
+    const scale = 85;
+    if (
+      lambda[0] === -l1 &&
+      lambda[1] === -l2 &&
+      lambda[2] === -l3 &&
+      lambda[3] === -l4 &&
+      lambda[4] === -l5
+    ) {
+      if (maxMesh > 2) {
+        return;
+      }
+      maxMesh += 1;
+      mesh1 = genMesh5D(-maxMesh, maxMesh);
+    } else {
+      maxMesh = 1;
     }
     p.clear();
     p.translate(width / 2, height / 2);
 
-    (l1 = val), (l2 = val2), (l3 = val3), (l4 = val4), (l5 = val5);
     lambda = [-l1, -l2, -l3, -l4, -l5];
     const mesh = [];
     for (let i = 0; i < mesh1.length; i++) {
@@ -231,15 +252,15 @@ function sketch_tilings(p) {
     }
     for (let i = 0; i < acceptedProjected.length; i++) {
       const [x, y] = acceptedProjected[i];
-      p.ellipse(x * scale - l1 * scale, y * scale - l1 * scale, 3, 3);
+      p.ellipse(x * scale - l1 * scale, y * scale - l2 * scale, 3, 3);
       for (let j = i + 1; j < accepted.length; j++) {
         const [v, w] = acceptedProjected[j];
         if (norm5D(diff(accepted[i], accepted[j])) <= 1) {
           p.line(
             x * scale - l1 * scale,
-            y * scale - l1 * scale,
+            y * scale - l2 * scale,
             v * scale - l1 * scale,
-            w * scale - l1 * scale
+            w * scale - l2 * scale
           );
         }
       }
