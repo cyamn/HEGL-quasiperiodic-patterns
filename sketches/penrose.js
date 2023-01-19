@@ -111,6 +111,14 @@ function sketch_tilings(p) {
     return [y * w - z * v, z * u - x * w, x * v - y * u];
   }
 
+  function scale5D(scalar, [x, y, z, u, v]) {
+    return [scalar * x, scalar * y, scalar * z, scalar * u, scalar * v];
+  }
+
+  function add5D([x, y, z, u, v], [x2, y2, z2, u2, v2]) {
+    return [x + x2, y + y2, z + z2, u + u2, v + v2];
+  }
+
   // works
   function norm3D([x, y, z]) {
     return p.sqrt(x * x + y * y + z * z);
@@ -190,13 +198,17 @@ function sketch_tilings(p) {
     return true;
   }
 
+  p.round5D = function ([x, y, z, v, w]) {
+    return [p.round(x), p.round(y), p.round(z), p.round(v), p.round(w)];
+  };
+  let base1, base2, raster;
   p.setup = function () {
     etas = generateEtas();
-    WMesh = genMesh5D(-1 / 2, 1 / 2);
-    W = [];
-    for (let i = 0; i < WMesh.length; i++) {
-      W.push(projectOrth(WMesh[i]));
-    }
+    // WMesh = genMesh5D(-1 / 2, 1 / 2);
+    // W = [];
+    // for (let i = 0; i < WMesh.length; i++) {
+    //   W.push(projectOrth(WMesh[i]));
+    // }
     lambda = Array(5).fill(0);
     l1 = 0.25;
     l2 = 0.25;
@@ -204,6 +216,24 @@ function sketch_tilings(p) {
     l4 = 0.25;
     l5 = 0.25;
     mesh1 = genMesh5D(minMesh, maxMesh);
+    const theta = (2 * p.PI) / 5.0;
+    base1 = [
+      p.sqrt(2 / 5),
+      p.cos(theta) * p.sqrt(2 / 5),
+      p.cos(2 * theta) * p.sqrt(2 / 5),
+      p.cos(3 * theta) * p.sqrt(2 / 5),
+      p.cos(4 * theta) * p.sqrt(2 / 5),
+    ];
+    base2 = [
+      0,
+      p.sin(theta) * p.sqrt(2 / 5),
+      p.sin(2 * theta) * p.sqrt(2 / 5),
+      p.sin(3 * theta) * p.sqrt(2 / 5),
+      p.sin(4 * theta) * p.sqrt(2 / 5),
+    ];
+
+    raster = 6 / p.sqrt(2 / 5);
+
     p.createCanvas(width, height);
     p.stroke(255);
     p.draw();
@@ -240,11 +270,22 @@ function sketch_tilings(p) {
     }
     // console.log(mesh.length);
     const accepted = [];
-    for (let i = 0; i < mesh.length; i++) {
-      if (inCutWindow(mesh[i])) {
-        accepted.push(mesh[i]);
+    let gridMax = 50;
+    for (let i = -gridMax; i < gridMax; i++) {
+      // if (inCutWindow(mesh[i])) {
+      //   accepted.push(mesh[i]);
+      // }
+      for (let j = -gridMax; j < gridMax; j++) {
+        const vecTmp0 = scale5D(i / raster, base1);
+        // console.log("vecTmp0: " + vecTmp0);
+        const vecAdded = add5D(vecTmp0, scale5D(j / raster, base2));
+        // console.log("vecAdded: ", vecAdded);
+        const vecRound = p.round5D(vecAdded);
+        accepted.push(vecRound);
+        // console.log("vecRound: " + vecRound);
       }
     }
+
     // console.log(accepted.length);
     const acceptedProjected = [];
     for (let i = 0; i < accepted.length; i++) {
@@ -253,18 +294,19 @@ function sketch_tilings(p) {
     for (let i = 0; i < acceptedProjected.length; i++) {
       const [x, y] = acceptedProjected[i];
       p.ellipse(x * scale - l1 * scale, y * scale - l2 * scale, 3, 3);
-      for (let j = i + 1; j < accepted.length; j++) {
-        const [v, w] = acceptedProjected[j];
-        if (norm5D(diff(accepted[i], accepted[j])) <= 1) {
-          p.line(
-            x * scale - l1 * scale,
-            y * scale - l2 * scale,
-            v * scale - l1 * scale,
-            w * scale - l2 * scale
-          );
-        }
-      }
+      // for (let j = i + 1; j < accepted.length; j++) {
+      //   const [v, w] = acceptedProjected[j];
+      //   if (norm5D(diff(accepted[i], accepted[j])) <= 1) {
+      //     p.line(
+      //       x * scale - l1 * scale,
+      //       y * scale - l2 * scale,
+      //       v * scale - l1 * scale,
+      //       w * scale - l2 * scale
+      //     );
+      //   }
+      // }
     }
+    console.log("points accepted: " + acceptedProjected.length);
     let currentTime = Date.now() - startTime;
     if (currentTime < oldtime)
       console.log(`time: ${currentTime} ms improved from ${oldtime} ms`);
