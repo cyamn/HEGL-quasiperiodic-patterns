@@ -37,57 +37,32 @@ function changeLambdaV(val) {
   document.getElementById("lambdaV").innerHTML = val;
 }
 
+// Code for Penrose starts here
+
 function sketch_tilings(p) {
+  const theta = (2 * p.PI) / 5.0;
+  const tau = Math.sqrt(2 / 5);
+
   // works
+  const [px1, px2, px3, px4, px5] = [
+    tau,
+    Math.cos(theta) * tau,
+    Math.cos(2 * theta) * tau,
+    Math.cos(3 * theta) * tau,
+    Math.cos(4 * theta) * tau,
+  ];
+
+  const [py1, py2, py3, py4, py5] = [
+    0,
+    Math.sin(theta) * tau,
+    Math.sin(2 * theta) * tau,
+    Math.sin(3 * theta) * tau,
+    Math.sin(4 * theta) * tau,
+  ];
   function project([_x, _y, _z, _v, _w]) {
-    const theta = (2 * p.PI) / 5.0;
-    const x =
-      (_x +
-        p.cos(theta) * _y +
-        p.cos(2 * theta) * _z +
-        p.cos(3 * theta) * _v +
-        p.cos(4 * theta) * _w) *
-      p.sqrt(2 / 5);
-    const y =
-      (p.sin(theta) * _y +
-        p.sin(2 * theta) * _z +
-        p.sin(3 * theta) * _v +
-        p.sin(4 * theta) * _w) *
-      p.sqrt(2 / 5);
+    const x = px1 * _x + px2 * _y + px3 * _z + px4 * _v + px5 * _w;
+    const y = py2 * _y + py3 * _z + py4 * _v + py5 * _w;
     return [x, y];
-  }
-
-  function diff([_x, _y, _z, _v, _w], [x, y, z, v, w]) {
-    return [_x - x, _y - y, _z - z, _v - v, _w - w];
-  }
-
-  function scalarMult(a, [x, y, z, v, w]) {
-    return [a * x, a * y, a * z, a * v, a * w];
-  }
-
-  // works
-  function projectOrth([_x, _y, _z, _v, _w]) {
-    const theta = (2 * p.PI) / 5.0;
-    const x =
-      (_x +
-        p.cos(2 * theta) * _y +
-        p.cos(4 * theta) * _z +
-        p.cos(1 * theta) * _v +
-        p.cos(3 * theta) * _w) *
-      p.sqrt(2 / 5);
-    const y =
-      (p.sin(2 * theta) * _y +
-        p.sin(4 * theta) * _z +
-        p.sin(1 * theta) * _v +
-        p.sin(3 * theta) * _w) *
-      p.sqrt(2 / 5);
-    const z = (_x + _y + _z + _v + _w) * p.sqrt(1 / 5);
-    return [x, y, z];
-  }
-
-  // works
-  function crossProduct3D([x, y, z], [u, v, w]) {
-    return [y * w - z * v, z * u - x * w, x * v - y * u];
   }
 
   function scale5D(scalar, [x, y, z, u, v]) {
@@ -96,15 +71,6 @@ function sketch_tilings(p) {
 
   function add5D([x, y, z, u, v], [x2, y2, z2, u2, v2]) {
     return [x + x2, y + y2, z + z2, u + u2, v + v2];
-  }
-
-  // works
-  function norm3D([x, y, z]) {
-    return p.sqrt(x * x + y * y + z * z);
-  }
-
-  function norm5D([x, y, z, v, w]) {
-    return p.sqrt(x * x + y * y + z * z + v * v + w * w);
   }
 
   // O(25)
@@ -143,6 +109,7 @@ function sketch_tilings(p) {
     l4 = 0.25;
     l5 = 0.25;
     const theta = (2 * p.PI) / 5.0;
+    raster = 18 / p.sqrt(2 / 5);
     base1 = [
       p.sqrt(2 / 5),
       p.cos(theta) * p.sqrt(2 / 5),
@@ -150,6 +117,7 @@ function sketch_tilings(p) {
       p.cos(3 * theta) * p.sqrt(2 / 5),
       p.cos(4 * theta) * p.sqrt(2 / 5),
     ];
+    base1 = scale5D(1.0 / raster, base1);
     base2 = [
       0,
       p.sin(theta) * p.sqrt(2 / 5),
@@ -157,19 +125,38 @@ function sketch_tilings(p) {
       p.sin(3 * theta) * p.sqrt(2 / 5),
       p.sin(4 * theta) * p.sqrt(2 / 5),
     ];
-
-    raster = 16 / p.sqrt(2 / 5);
+    base2 = scale5D(1.0 / raster, base2);
 
     p.createCanvas(width, height);
     p.stroke(255);
     p.draw();
   };
 
+  let startTime = Date.now();
+  let durationFilter = 0;
+  let durationProject = 0;
+  let durationDraw = 0;
+  function logTime(message) {
+    console.log(
+      message +
+        ": " +
+        (Date.now() - startTime) +
+        "ms -> Accept[" +
+        durationFilter +
+        "] + Project[" +
+        durationProject +
+        "] + Draw[" +
+        durationDraw +
+        "]"
+    );
+    startTime = Date.now();
+  }
+
   // Penrose tiling
   p.draw = function () {
     maxMesh = 3;
 
-    let startTime = Date.now();
+    startTime = Date.now();
     const scale = 50;
     if (
       lambda[0] === -l1 &&
@@ -180,30 +167,30 @@ function sketch_tilings(p) {
     ) {
       return;
     }
+    // console.log("\n\n\n\n\n\n");
     p.clear();
     p.translate(width / 2, height / 2);
 
     lambda = [-l1, -l2, -l3, -l4, -l5];
     // console.log(mesh.length);
-    let accepted = [];
 
-    let gridMax = 200;
+    let startFilter = Date.now();
+    let gridMax = 250;
+    let accepted = Array(2 * gridMax).fill([]);
+    let vecTmp0, vecTmp1, vecAdded, vecRound;
     for (let i = 0; i < 2 * gridMax; i++) {
-      // if (inCutWindow(mesh[i])) {
-      //   accepted.push(mesh[i]);
-      // }
-      accepted.push([]);
+      accepted[i] = Array(2 * gridMax).fill([]);
       for (let j = 0; j < 2 * gridMax; j++) {
-        const vecTmp0 = scale5D((i - gridMax) / raster, base1);
-        // console.log("vecTmp0: " + vecTmp0);
-        const vecAdded = add5D(vecTmp0, scale5D((j - gridMax) / raster, base2));
-        // console.log("vecAdded: ", vecAdded);
-        const vecRound = p.round5D(vecAdded);
-        accepted[i].push(vecRound);
-        // console.log("vecRound: " + vecRound);
+        vecTmp0 = scale5D(i - gridMax, base1);
+        vecTmp1 = scale5D(j - gridMax, base2);
+        vecAdded = add5D(vecTmp0, vecTmp1);
+        vecRound = p.round5D(vecAdded);
+        accepted[i][j] = vecRound;
       }
     }
+    durationFilter = Date.now() - startFilter;
 
+    let timeProject = Date.now();
     // console.log(accepted.length);
     const acceptedProjected = [];
     for (let i = 0; i < accepted.length; i++) {
@@ -212,34 +199,31 @@ function sketch_tilings(p) {
         acceptedProjected[i].push(project(accepted[i][j]));
       }
     }
-    console.log(`Time to generate points: ${Date.now() - startTime}ms`);
+    durationProject = Date.now() - timeProject;
 
+    let timeDraw = Date.now();
     // O(100*n^2)
     const l1Scaled = l1 * scale;
     const l2Scaled = l2 * scale;
     var xScaledShifted;
     var yScaledShifted;
+    var kMax = 2;
+    var lMax = 2;
     for (let i = 0; i < acceptedProjected.length; i++) {
       for (let j = 0; j < acceptedProjected[i].length; j++) {
         const [x, y] = acceptedProjected[i][j];
         xScaledShifted = x * scale - l1Scaled;
         yScaledShifted = y * scale - l2Scaled;
         // O(100)
-        for (let k = 0; k < 2; k++) {
-          for (let l = 0; l < 2; l++) {
+
+        kMax = Math.min(i + 2, accepted.length);
+        lMax = Math.min(j + 2, accepted[i].length);
+
+        for (let k = i; k < kMax; k++) {
+          for (let l = j; l < lMax; l++) {
             if (k == 0 && l == 0) continue;
-            const [xkl, ykl] =
-              acceptedProjected[Math.min(i + k, acceptedProjected.length - 1)][
-                Math.min(j + l, acceptedProjected[i].length - 1)
-              ];
-            if (
-              isNeighbor(
-                accepted[Math.min(i + k, acceptedProjected.length - 1)][
-                  Math.min(j + l, acceptedProjected[i].length - 1)
-                ],
-                accepted[i][j]
-              )
-            ) {
+            const [xkl, ykl] = acceptedProjected[k][l];
+            if (isNeighbor(accepted[k][l], accepted[i][j])) {
               p.line(
                 xScaledShifted,
                 yScaledShifted,
@@ -251,11 +235,10 @@ function sketch_tilings(p) {
         }
       }
     }
-    console.log("points accepted: " + acceptedProjected.length);
-    let currentTime = Date.now() - startTime;
-    if (currentTime < oldtime)
-      console.log(`time: ${currentTime} ms improved from ${oldtime} ms`);
-    else console.log(`time: ${currentTime} ms worse than ${oldtime} ms`);
+    durationDraw = Date.now() - timeDraw;
+    // console.log(`Time to draw: ${Date.now() - timeDraw}ms`);
+    // console.log("points accepted: " + acceptedProjected.length);
+    logTime("Time for draw");
   };
 }
 
