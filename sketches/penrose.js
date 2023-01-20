@@ -38,22 +38,6 @@ function changeLambdaV(val) {
 }
 
 function sketch_tilings(p) {
-  function genMesh5D(lower, upper) {
-    var mesh = [];
-    for (x = lower; x <= upper; x++) {
-      for (y = lower; y <= upper; y++) {
-        for (z = lower; z <= upper; z++) {
-          for (v = lower; v <= upper; v++) {
-            for (w = lower; w <= upper; w++) {
-              mesh.push([x, y, z, v, w]);
-            }
-          }
-        }
-      }
-    }
-    return mesh;
-  }
-
   // works
   function project([_x, _y, _z, _v, _w]) {
     const theta = (2 * p.PI) / 5.0;
@@ -102,11 +86,6 @@ function sketch_tilings(p) {
   }
 
   // works
-  function dotProduct3D([x, y, z], [u, v, w]) {
-    return x * u + y * v + z * w;
-  }
-
-  // works
   function crossProduct3D([x, y, z], [u, v, w]) {
     return [y * w - z * v, z * u - x * w, x * v - y * u];
   }
@@ -128,94 +107,41 @@ function sketch_tilings(p) {
     return p.sqrt(x * x + y * y + z * z + v * v + w * w);
   }
 
-  // function generateIthEta()
-
-  function generateEtas() {
-    const etas = [];
-    for (let i = 0; i < 5; i++) {
-      for (let j = 0; j < 5; j++) {
-        // unit vector dim 5 with 1 at position i
-        let e_r = Array(5).fill(0);
-        e_r[i] = 1;
-        // unit vector dim 5 with 1 at position j
-        let e_s = Array(5).fill(0);
-        e_s[j] = 1;
-
-        // projectOrth both
-        let e_r_proj = projectOrth(e_r);
-        let e_s_proj = projectOrth(e_s);
-
-        // cross product
-        let tmp = crossProduct3D(e_r_proj, e_s_proj);
-
-        // normalize
-        let tmp_norm = norm3D(tmp);
-        if (tmp_norm === 0) {
-          continue;
-        }
-
-        // divide by norm
-        let eta = [tmp[0] / tmp_norm, tmp[1] / tmp_norm, tmp[2] / tmp_norm];
-        //let etaMinus = [-eta[0], -eta[1], -eta[2]];
-
-        etas.push(eta);
-        //etas.push(etaMinus);
-      }
-    }
-    return etas;
-  }
-
-  function inCutWindow([x, y, z, v, w]) {
-    // const etas = generateEtas();
-    // console.log("etas: " + etas.length);
-    const projected = projectOrth([x, y, z, v, w]);
-    for (let j = 0; j < etas.length; j++) {
-      let eta = etas[j];
-      // const maxI = W.map(w => dotProduct3D(w, eta)).reduce((a, b) => Math.max(a, b))
-      // const I = W.map((w) => dotProduct3D(w, eta));
-      const I = [];
-      for (let i = 0; i < W.length; i++) {
-        I.push(dotProduct3D(eta, W[i]));
-      }
-      if (I.length === 0) {
-        // console.log("I is empty");
-      }
-      // get max element from I
-      let maxI = I[0];
-      for (let i = 1; i < I.length; i++) {
-        if (I[i] > maxI) {
-          maxI = I[i];
+  // O(25)
+  function isNeighbor(vec1, vec2) {
+    var diff = 0;
+    var differences = 0;
+    for (var i = 0; i < 5; i++) {
+      diff = vec1[i] - vec2[i];
+      if (diff === 1 || diff === -1) {
+        differences++;
+      } else {
+        if (diff !== 0) {
+          return false;
         }
       }
-      if (isNaN(maxI)) {
-        // console.log("I is " + I);
-      }
-      // console.log("maxI: " + maxI);
-      if (dotProduct3D(eta, projected) > maxI) {
+      if (differences > 1 || differences < -1) {
         return false;
       }
     }
-    return true;
+    return differences === 1;
   }
+
+  // function generateIthEta()
 
   p.round5D = function ([x, y, z, v, w]) {
     return [p.round(x), p.round(y), p.round(z), p.round(v), p.round(w)];
   };
   let base1, base2, raster;
+
   p.setup = function () {
-    etas = generateEtas();
-    // WMesh = genMesh5D(-1 / 2, 1 / 2);
-    // W = [];
-    // for (let i = 0; i < WMesh.length; i++) {
-    //   W.push(projectOrth(WMesh[i]));
-    // }
+    p.disableFriendlyErrors = true; // disables FES
     lambda = Array(5).fill(0);
     l1 = 0.25;
     l2 = 0.25;
     l3 = 0.25;
     l4 = 0.25;
     l5 = 0.25;
-    mesh1 = genMesh5D(minMesh, maxMesh);
     const theta = (2 * p.PI) / 5.0;
     base1 = [
       p.sqrt(2 / 5),
@@ -232,7 +158,7 @@ function sketch_tilings(p) {
       p.sin(4 * theta) * p.sqrt(2 / 5),
     ];
 
-    raster = 6 / p.sqrt(2 / 5);
+    raster = 16 / p.sqrt(2 / 5);
 
     p.createCanvas(width, height);
     p.stroke(255);
@@ -244,7 +170,7 @@ function sketch_tilings(p) {
     maxMesh = 3;
 
     let startTime = Date.now();
-    const scale = 85;
+    const scale = 50;
     if (
       lambda[0] === -l1 &&
       lambda[1] === -l2 &&
@@ -252,36 +178,28 @@ function sketch_tilings(p) {
       lambda[3] === -l4 &&
       lambda[4] === -l5
     ) {
-      if (maxMesh > 2) {
-        return;
-      }
-      maxMesh += 1;
-      mesh1 = genMesh5D(-maxMesh, maxMesh);
-    } else {
-      maxMesh = 1;
+      return;
     }
     p.clear();
     p.translate(width / 2, height / 2);
 
     lambda = [-l1, -l2, -l3, -l4, -l5];
-    const mesh = [];
-    for (let i = 0; i < mesh1.length; i++) {
-      mesh.push(diff(mesh1[i], lambda));
-    }
     // console.log(mesh.length);
-    const accepted = [];
-    let gridMax = 50;
-    for (let i = -gridMax; i < gridMax; i++) {
+    let accepted = [];
+
+    let gridMax = 200;
+    for (let i = 0; i < 2 * gridMax; i++) {
       // if (inCutWindow(mesh[i])) {
       //   accepted.push(mesh[i]);
       // }
-      for (let j = -gridMax; j < gridMax; j++) {
-        const vecTmp0 = scale5D(i / raster, base1);
+      accepted.push([]);
+      for (let j = 0; j < 2 * gridMax; j++) {
+        const vecTmp0 = scale5D((i - gridMax) / raster, base1);
         // console.log("vecTmp0: " + vecTmp0);
-        const vecAdded = add5D(vecTmp0, scale5D(j / raster, base2));
+        const vecAdded = add5D(vecTmp0, scale5D((j - gridMax) / raster, base2));
         // console.log("vecAdded: ", vecAdded);
         const vecRound = p.round5D(vecAdded);
-        accepted.push(vecRound);
+        accepted[i].push(vecRound);
         // console.log("vecRound: " + vecRound);
       }
     }
@@ -289,22 +207,49 @@ function sketch_tilings(p) {
     // console.log(accepted.length);
     const acceptedProjected = [];
     for (let i = 0; i < accepted.length; i++) {
-      acceptedProjected.push(project(accepted[i]));
+      acceptedProjected.push([]);
+      for (let j = 0; j < accepted[i].length; j++) {
+        acceptedProjected[i].push(project(accepted[i][j]));
+      }
     }
+    console.log(`Time to generate points: ${Date.now() - startTime}ms`);
+
+    // O(100*n^2)
+    const l1Scaled = l1 * scale;
+    const l2Scaled = l2 * scale;
+    var xScaledShifted;
+    var yScaledShifted;
     for (let i = 0; i < acceptedProjected.length; i++) {
-      const [x, y] = acceptedProjected[i];
-      p.ellipse(x * scale - l1 * scale, y * scale - l2 * scale, 3, 3);
-      // for (let j = i + 1; j < accepted.length; j++) {
-      //   const [v, w] = acceptedProjected[j];
-      //   if (norm5D(diff(accepted[i], accepted[j])) <= 1) {
-      //     p.line(
-      //       x * scale - l1 * scale,
-      //       y * scale - l2 * scale,
-      //       v * scale - l1 * scale,
-      //       w * scale - l2 * scale
-      //     );
-      //   }
-      // }
+      for (let j = 0; j < acceptedProjected[i].length; j++) {
+        const [x, y] = acceptedProjected[i][j];
+        xScaledShifted = x * scale - l1Scaled;
+        yScaledShifted = y * scale - l2Scaled;
+        // O(100)
+        for (let k = 0; k < 2; k++) {
+          for (let l = 0; l < 2; l++) {
+            if (k == 0 && l == 0) continue;
+            const [xkl, ykl] =
+              acceptedProjected[Math.min(i + k, acceptedProjected.length - 1)][
+                Math.min(j + l, acceptedProjected[i].length - 1)
+              ];
+            if (
+              isNeighbor(
+                accepted[Math.min(i + k, acceptedProjected.length - 1)][
+                  Math.min(j + l, acceptedProjected[i].length - 1)
+                ],
+                accepted[i][j]
+              )
+            ) {
+              p.line(
+                xScaledShifted,
+                yScaledShifted,
+                xkl * scale - l1Scaled,
+                ykl * scale - l2Scaled
+              );
+            }
+          }
+        }
+      }
     }
     console.log("points accepted: " + acceptedProjected.length);
     let currentTime = Date.now() - startTime;
