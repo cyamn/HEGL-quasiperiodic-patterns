@@ -1,3 +1,5 @@
+import KDTree from "./KD-tree.js";
+
 const width = 900;
 const height = 600;
 
@@ -11,29 +13,35 @@ let l1, l2, l3, l4, l5;
 // let oldtime = 450;
 // let oldtime = 230;
 let oldtime = 120;
+let scaleCanvas = 50;
 
 let etas;
 let W;
 let mesh1;
 
+let OFF = [0.25, 0.25, 0.25, 0.25, 0.25];
+
 function changeLambdaX(val) {
-  l1 = parseFloat(val);
+  l1 = (parseFloat(val) * scaleCanvas) / 10;
   document.getElementById("lambdaX").innerHTML = val;
 }
 function changeLambdaY(val) {
-  l2 = parseFloat(val);
+  l2 = (parseFloat(val) * scaleCanvas) / 10;
   document.getElementById("lambdaY").innerHTML = val;
 }
 function changeLambdaZ(val) {
-  l3 = parseFloat(val);
+  scaleCanvas = parseInt(val);
   document.getElementById("lambdaZ").innerHTML = val;
 }
+const u2dir = [0.632456, -0.511667, 0.19544, 0.19544, -0.511667];
+const v2dir = [0, 0.371748, -0.601501, 0.601501, -0.371748];
+const adir = [0.447214, 0.447214, 0.447214, 0.447214, 0.447214];
 function changeLambdaC(val) {
   l4 = parseFloat(val);
   document.getElementById("lambdaC").innerHTML = val;
 }
 function changeLambdaV(val) {
-  l5 = parseFloat(val);
+  l5 = (parseFloat(val) * scaleCanvas) / 10;
   document.getElementById("lambdaV").innerHTML = val;
 }
 
@@ -59,6 +67,7 @@ function sketch_tilings(p) {
     Math.sin(3 * theta) * tau,
     Math.sin(4 * theta) * tau,
   ];
+
   function project([_x, _y, _z, _v, _w]) {
     const x = px1 * _x + px2 * _y + px3 * _z + px4 * _v + px5 * _w;
     const y = py2 * _y + py3 * _z + py4 * _v + py5 * _w;
@@ -74,6 +83,8 @@ function sketch_tilings(p) {
   }
 
   // O(25)
+  let dublicates = 0;
+  let unique = 0;
   function isNeighbor(vec1, vec2) {
     var diff = 0;
     var differences = 0;
@@ -90,11 +101,12 @@ function sketch_tilings(p) {
         return false;
       }
     }
+    if (differences === 0) dublicates++;
+    else unique++;
     return differences === 1;
   }
 
   // function generateIthEta()
-
   p.round5D = function ([x, y, z, v, w]) {
     return [p.round(x), p.round(y), p.round(z), p.round(v), p.round(w)];
   };
@@ -109,7 +121,7 @@ function sketch_tilings(p) {
     l4 = 0.25;
     l5 = 0.25;
     const theta = (2 * p.PI) / 5.0;
-    raster = 18 / p.sqrt(2 / 5);
+    raster = 120;
     base1 = [
       p.sqrt(2 / 5),
       p.cos(theta) * p.sqrt(2 / 5),
@@ -153,20 +165,24 @@ function sketch_tilings(p) {
   }
 
   // Penrose tiling
+  let scale = -1;
   p.draw = function () {
     maxMesh = 3;
-
     startTime = Date.now();
-    const scale = 50;
     if (
       lambda[0] === -l1 &&
       lambda[1] === -l2 &&
       lambda[2] === -l3 &&
       lambda[3] === -l4 &&
-      lambda[4] === -l5
+      lambda[4] === -l5 &&
+      scale === scaleCanvas
     ) {
       return;
     }
+    for (var i = 0; i < 5; i++) {
+      OFF[i] = l4 * u2dir[i] + l4 * v2dir[i] + l4 * adir[i];
+    }
+    scale = scaleCanvas;
     // console.log("\n\n\n\n\n\n");
     p.clear();
     p.translate(width / 2, height / 2);
@@ -178,13 +194,15 @@ function sketch_tilings(p) {
     let gridMax = 250;
     let accepted = Array(2 * gridMax).fill([]);
     let vecTmp0, vecTmp1, vecAdded, vecRound;
+
     for (let i = 0; i < 2 * gridMax; i++) {
       accepted[i] = Array(2 * gridMax).fill([]);
       for (let j = 0; j < 2 * gridMax; j++) {
         vecTmp0 = scale5D(i - gridMax, base1);
         vecTmp1 = scale5D(j - gridMax, base2);
         vecAdded = add5D(vecTmp0, vecTmp1);
-        vecRound = p.round5D(vecAdded);
+        vecAdded2 = add5D(vecAdded, OFF);
+        vecRound = p.round5D(vecAdded2);
         accepted[i][j] = vecRound;
       }
     }
@@ -239,6 +257,14 @@ function sketch_tilings(p) {
     // console.log(`Time to draw: ${Date.now() - timeDraw}ms`);
     // console.log("points accepted: " + acceptedProjected.length);
     logTime("Time for draw");
+    console.log(
+      "unique points=" +
+        unique +
+        " dublicates=" +
+        dublicates +
+        " ratio=" +
+        unique / (unique + dublicates)
+    );
   };
 }
 
